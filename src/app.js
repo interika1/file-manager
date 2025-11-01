@@ -16,9 +16,9 @@ import {
     currentDirectory,
     invalidInput,
     operationError,
-} from './utils/messages.js';
-import { isExisting } from './utils/checkers.js';
-import { osSwitcher } from './utils/osSwitcher.js';
+} from '../utils/messages.js';
+import { isExisting } from '../helper/checkers.js';
+import { osSwitcher } from '../helper/osSwitcher.js';
 const rl = createInterface({
     input: process.stdin,
     output: process.stdout,
