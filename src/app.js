@@ -2,6 +2,7 @@ import { createInterface } from 'node:readline';
 import { createReadStream, createWriteStream } from 'node:fs';
 import {
     readdir,
+    readFile,
     writeFile,
     access,
     rename,
@@ -9,13 +10,20 @@ import {
     rm as remove,
 } from 'node:fs/promises';
 import { pipeline } from 'node:stream/promises';
-import { resolve, dirname, basename } from 'node:path';
+import { resolve, dirname, basename, extname } from 'node:path';
+import { createHash } from 'node:crypto';
 import {
     currentDirectory,
     invalidInput,
     operationError,
 } from './utils/messages.js';
 import { isExisting } from './utils/checkers.js';
+import { osSwitcher } from './utils/osSwitcher.js';
+const rl = createInterface({
+    input: process.stdin,
+    output: process.stdout,
+    prompt: '> ',
+});
 
 export class App {
     constructor(dir) {
@@ -49,7 +57,6 @@ export class App {
     async cat([arg]) {
         const pathToFile = resolve(this.currentDir, arg);
         await access(pathToFile);
-
         const readableStream = createReadStream(pathToFile);
         await new Promise((res, rej) => {
             let data = '';
@@ -99,17 +106,26 @@ export class App {
         await this.rm([file]);
     }
 
+    os([arg]) {
+        osSwitcher(arg);
+    }
+
+    async hash([file]) {
+        const pathToFile = resolve(this.currentDir, file);
+        const buffer = await readFile(pathToFile);
+        const hash = createHash('sha256').update(buffer).digest('hex');
+        console.log(hash);
+    }
+
+    ['.exit']() {
+        process.exit();
+    }
+
     async start() {
         currentDirectory(this.currentDir);
-        const rl = createInterface({
-            input: process.stdin,
-            output: process.stdout,
-            prompt: '> ',
-        });
-
         rl.prompt();
         rl.on('line', async (input) => {
-            const command = input.trim().split(' '); //todo: fix ""
+            const command = input.trim().split(' ');
             const parsedCommand = {
                 command: command[0],
                 args: command.slice(1),
@@ -123,7 +139,6 @@ export class App {
             }
 
             try {
-                console.log('!', parsedCommand);
                 await this[parsedCommand.command](parsedCommand.args);
                 currentDirectory(this.currentDir);
             } catch (e) {

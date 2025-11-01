@@ -9,7 +9,7 @@ export default () => {
         ? usernameArg.replace('--username=', '').trim()
         : DEFAULT_USERNAME;
 
-    process.on('exit', () => exitMessage(username));
-
     greetingMessage(username);
+
+    process.on('exit', () => exitMessage(username));
 };

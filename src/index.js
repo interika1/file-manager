@@ -1,6 +1,6 @@
 import { homedir } from 'node:os';
 import { App } from './app.js';
-import greeting from './utils/greeting.js';
+import greeting from '../helper/greeting.js';
 
 greeting();
 
