@@ -16,7 +16,7 @@ import {
     currentDirectory,
     invalidInput,
     operationError,
-} from '../utils/messages.js';
+} from '../helper/messages.js';
 import { isExisting } from '../helper/checkers.js';
 import { osSwitcher } from '../helper/osSwitcher.js';
 const rl = createInterface({
